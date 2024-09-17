@@ -1,0 +1,12 @@
+---
+title: "Data Impoty"
+output: github_document
+---
+
+I'm an R Markdown document! 
+
+```{r setup, echo = FALSE. message = FALSE}
+library(tidyverse)
+```
+
+This documnet will show how to import. 
