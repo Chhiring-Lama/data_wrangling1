@@ -9,4 +9,149 @@ I'm an R Markdown document!
 library(tidyverse)
 ```
 
-This documnet will show how to import. 
+```{r}
+### get the working directory
+getwd()
+```
+
+# Import the FAS litters CSV
+```{r}
+litters_df <- read_csv("./data/FAS_litters.csv")
+
+head(litters_df)
+tail(litters_df)
+```
+
+```{r eval = FALSE}
+view(litters_df)
+```
+
+View the column names of the dataset and rename using `clean_names` function. This by default changes the names to snake case, but we can specify other cases as well. 
+```{r}
+names(litters_df) 
+
+litters_df <- janitor::clean_names(litters_df) 
+names(litters_df)
+```
+
+## Learning Assessment
+
+Make sure you are able to load the FAS_pups.csv dataset. Use both absolute and relative paths. Quit R Studio and move the directory containing your project, data, and R Markdown document. Repeat the previous data import process; do both absolute and relative paths still work?
+
+### Solution
+
+Importing FAS_pups file using absoulte path and view the file's top 6 rows:
+```{r}
+pups_df <- read_csv("/Users/chhiringlama2/OneDrive - Columbia University Irving Medical Center/Course Materials/Data Science 1/20240917_Data_wrangling1/Data/FAS_pups.csv")
+head(pups_df)
+```
+
+Importing FAS_pups file using relative path and view the file's top 6 rows:
+```{r}
+pups_df <- read_csv("./data/FAS_pups.csv")
+head(pups_df)
+```
+
+We can use `skimr::skim` to view the tibble dataframe in a neater manner including some of the summaries
+
+```{r}
+skimr::skim(pups_df)
+```
+
+# Look at read_csv options
+
+col_names and skipping rows
+```{r}
+litters_df_alt <- read_csv("./data/FAS_litters.csv", 
+                       skip = 2, # skip the 1st nth row
+                       col_names = FALSE) #removes column names if present
+```
+
+What about missing data?
+
+For example, in the column `GD0 weight` that is mostly numeric, there are some NAs and some . both of which indicate missing data. So we need to convert the dots to NA values. We can also specify the data type of te columns
+```{r warning}
+litters_df_alt2 = 
+    read_csv(file = "./data/FAS_litters.csv",
+        na = c(".", "NA", ""),
+    col_types = cols(
+      Group = col_character(),
+      `Litter Number` = col_character(),
+      `GD0 weight` = col_double(),
+      `GD18 weight` = col_double(),
+      `GD of Birth` = col_integer(),
+      `Pups born alive` = col_integer(),
+      `Pups dead @ birth` = col_integer(),
+      `Pups survive` = col_integer()
+    )
+  )
+
+litters_df_alt2 <- janitor::clean_names(litters_df_alt2) 
+```
+
+
+## Learning Assessment: 
+
+Repeat the data import process above for the file FAS_pups.csv. Make sure the column names are reasonable, and take some quick looks at the dataset. What happens if your specifications for column parsing aren’t reasonable (e.g. character instead of double, or vice versa)?
+
+### Solution:
+
+```{r}
+pups_df_alt <- read_csv("./data/FAS_pups.csv")
+head(pups_df_alt)
+```
+
+We see that when we import it is as it is 'PD ears' is a character vector instead of a double. This is because of the presence of a "." in the column indicating a missing value. Reimporting, correcting names and using prpoer column name based on naming convention:
+```{r}
+pups_df_alt <- read_csv("./data/FAS_pups.csv", 
+                       na = c(".", "NA", "")) 
+
+pups_df_alt <- janitor::clean_names(pups_df_alt) 
+head(pups_df_alt)
+```
+
+Now, we see corrected column nmaes and 'pd_ears' as a column with `dbl`data type. 
+
+# Import an excel file
+
+```{r}
+library(readxl)
+
+mlb11_df = read_excel("./data/mlb11.xlsx", n_max = 20)
+
+head(mlb11_df, 5)
+```
+
+# Import R file from SAS, Stata and SPSS
+
+```{r}
+library(haven)
+
+pulse_df = read_sas("./data/public_pulse_data.sas7bdat")
+
+head(pulse_df, 5)
+```
+
+##Learning Assessment:
+
+Import the FAS_pups.csv dataset using read.csv. Compare the class of this dataset to the one produced by read_csv. Try printing both in the console – what happens? After cleaning up the names, try accessing the Sex variable using S (e.g., pups_df$S). What happens?
+
+### Solution:
+
+Import using  `read.csv`
+```{r}
+pups_base = read.csv("./data/FAS_pups.csv")
+pups_readr = read_csv("./data/FAS_pups.csv")
+
+View(pups_base)
+View(pups_readr)
+
+pups_base
+pups_readr
+
+pups_base$S
+pups_readr$S
+```
+
+The dataset is not in the tibble format anymore so doesn't have useful information such as datatypes
+
