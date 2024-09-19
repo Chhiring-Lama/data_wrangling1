@@ -3,6 +3,7 @@ title: "Data Manipulation"
 author: "Chhiring Lama"
 date: "2024-09-19"
 output: github_document
+
 ---
 
 ```{r setup, echo = FALSE, message = F}
