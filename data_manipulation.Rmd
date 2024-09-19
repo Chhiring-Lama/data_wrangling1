@@ -1,0 +1,86 @@
+---
+title: "Data Manipulation"
+author: "Chhiring Lama"
+date: "2024-09-19"
+output: github_document
+---
+
+```{r setup, echo = FALSE, message = F}
+library(tidyverse)
+```
+
+This document will sow to "manipulate" data.
+
+Import the two datasets that we're going to manipulate
+
+```{r}
+litters_df <- read_csv("./Data/FAS_litters.csv", na = c("NA", ".", ""))
+
+litters_df <- janitor::clean_names(litters_df)
+
+pups_df <- read_csv("./Data/FAS_pups.csv", na = c("NA", ".", ""))
+
+pups_df <- janitor::clean_names(pups_df)
+                       
+```
+
+# `select`
+
+Use `select()` to select variables
+
+```{r}
+select(litters_df, group, litter_number, gd18_weight)
+```
+
+```{r}
+select(litters_df, group:gd18_weight)
+```
+
+```{r}
+select(litters_df, -c(gd0_weight, gd18_weight)) ##deselects these columns
+```
+
+```{r}
+select(litters_df, starts_with("gd")) ##selects columns whose name start with gd_
+```
+
+```{r}
+select(litters_df, GROUP = group) ##selects group and renames them
+rename(litters_df, GROUP = group) ##renames but keeps all columns as they are 
+
+select(litters_df, litter_number, gd0_weight, everything()) ##first gives two columns and then everything else
+
+relocate(litters_df, litter_number, gd0_weight) ##first gives two columns and then everything else
+```
+
+## Learning Assessment: 
+
+In the pups data, select the columns containing litter number, sex, and PD ears.
+```{r}
+select(pups_df, litter_number, sex, pd_ears) 
+select(pups_df, litter_number:pd_ears) ##as they are consecutive columns
+```
+
+# `filter`
+
+```{r}
+filter(litters_df, gd_of_birth == 20) ##runs a Boolean function and returns rows that match this criterion
+```
+
+```{r}
+filter(litters_df, pups_born_alive >= 8) 
+filter(litters_df, pups_born_alive != 18) 
+```
+
+
+```{r}
+filter(litters_df, group == "Low8") 
+filter(litters_df, group %in% c("Low8", "low7")) # either
+```
+
+```{r}
+filter(litters_df, group %in% c("Low8", "low7"), pups_born_alive == 8) ##true for group and for pups born alive
+```
+
+
+
