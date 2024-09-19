@@ -13,7 +13,7 @@ This document will sow to "manipulate" data.
 
 Import the two datasets that we're going to manipulate
 
-```{r}
+```{r import_datasets, message=FALSE}
 litters_df <- read_csv("./Data/FAS_litters.csv", na = c("NA", ".", ""))
 
 litters_df <- janitor::clean_names(litters_df)
@@ -81,6 +81,148 @@ filter(litters_df, group %in% c("Low8", "low7")) # either
 ```{r}
 filter(litters_df, group %in% c("Low8", "low7"), pups_born_alive == 8) ##true for group and for pups born alive
 ```
+
+
+```{r}
+drop_na(litters_df) ## drops rows with na in any column
+drop_na(litters_df, gd0_weight) ##drops rows with na in the column gd0_weight
+```
+
+
+## Learning Assessment
+In the pups data:
+
+Filter to include only pups with sex 1
+Filter to include only pups with PD walk less than 11 and sex 2
+
+### Solution
+```{r}
+filter(pups_df, sex == 1) 
+filter(pups_df, pd_walk < 11, sex == 2) 
+```
+
+# `mutate`
+
+```{r}
+mutate(litters_df,
+  wt_gain = gd18_weight - gd0_weight,
+  group = str_to_lower(group)
+)
+
+mutate(litters_df, sq_pups = pups_born_alive^2)
+```
+
+## Learning Assessment: 
+In the pups data:
+
+Create a variable that subtracts 7 from PD pivot
+Create a variable that is the sum of all the PD variables
+
+### Solution
+```{r}
+mutate(pups_df, 
+       subtracted_pd_pivot = pd_pivot - 7, 
+       sum_pd_vars = sum(select(pups_df,starts_with("pd_"))))
+```
+
+# `arrange`
+
+```{r}
+arrange(litters_df, gd0_weight)
+
+arrange(litters_df, desc(gd0_weight))
+
+arrange(litters_df, pups_born_alive, gd0_weight)
+```
+
+
+# PIPING
+
+If we use individual functions separately that is a lot of repetition of assigning each new function to the variable.
+
+Option 1 (not to use):
+```{r, eval=FALSE}
+litters_df_raw = 
+    read_csv("./data/FAS_litters.csv", na = c("NA", ".", ""))
+
+litters_df_clean_names = janitor::clean_names(litters_df_raw)
+litters_df_selected_cols = select(litters_df_clean_names, -pups_survive)
+litters_df_with_vars = 
+  mutate(
+    litters_df_selected_cols, 
+    wt_gain = gd18_weight - gd0_weight,
+    group = str_to_lower(group))
+litters_df_with_vars_without_missing = 
+  drop_na(litters_df_with_vars, wt_gain)
+litters_df_with_vars_without_missing
+```
+
+Option 2(not to use): can nest each code, however it is very difficult to read and troubleshoot when needed
+
+```{r, eval=FALSE}
+litters_df_clean = 
+  drop_na(
+    mutate(
+      select(
+        janitor::clean_names(
+          read_csv("./data/FAS_litters.csv", na = c("NA", ".", ""))
+          ), 
+      -pups_survive
+      ),
+    wt_gain = gd18_weight - gd0_weight,
+    group = str_to_lower(group)
+    ),
+  wt_gain
+  )
+```
+
+
+This is when piping comes in
+
+```{r}
+litters_df_clean <- read_csv("./Data/FAS_litters.csv", na = c("NA", ".", "")) |>  
+  janitor::clean_names() |>  
+  select(-pups_born_alive) |> 
+  filter(gd_of_birth == 20) |> 
+  mutate(
+    wt_gain = gd18_weight - gd0_weight,
+    group = str_to_lower(group)) |> 
+  drop_na()
+  
+```
+
+If we want to run a linear regression on the weight gain: 
+```{r}
+read_csv("./Data/FAS_litters.csv", na = c("NA", ".", "")) |>  
+  janitor::clean_names() |>  
+  mutate(
+    wt_gain = gd18_weight - gd0_weight) |> 
+  lm(wt_gain ~ pups_born_alive, data = _) |>
+  broom::tidy() ##shows in a cleaner dataframe format
+```
+
+
+## Learning Assessment: 
+
+Write a chain of commands that:
+
+loads the pups data
+cleans the variable names
+filters the data to include only pups with sex 1
+removes the PD ears variable
+creates a variable that indicates whether PD pivot is 7 or more days
+
+### Solution
+```{r}
+pups_df_clean <- read_csv("./Data/FAS_pups.csv", na = c("NA", ".", "")) |>  
+  janitor::clean_names() |>  
+  filter(sex == 1) |> 
+  select(-pd_ears) |> 
+  mutate(
+    pd_pivot_greater_7 = (pd_pivot >= 7))
+```
+
+
 
 
 
