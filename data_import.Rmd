@@ -1,12 +1,13 @@
 ---
-title: "Data Impoty"
+title: "Data Import"
 output: github_document
 ---
 
 I'm an R Markdown document! 
 
-```{r setup, echo = FALSE. message = FALSE}
+```{r setup, echo = FALSE, message = FALSE}
 library(tidyverse)
+library(readr)
 ```
 
 ```{r}
@@ -42,7 +43,7 @@ Make sure you are able to load the FAS_pups.csv dataset. Use both absolute and r
 
 Importing FAS_pups file using absoulte path and view the file's top 6 rows:
 ```{r}
-pups_df <- read_csv("/Users/chhiringlama2/OneDrive - Columbia University Irving Medical Center/Course Materials/Data Science 1/20240917_Data_wrangling1/Data/FAS_pups.csv")
+pups_df <- read_csv("/Users/chhiringlama2/OneDrive - Columbia University Irving Medical Center/Course Materials/Fall 2024/Data Science 1/20240917_Data_wrangling1/Data/FAS_pups.csv")
 head(pups_df)
 ```
 
@@ -143,14 +144,14 @@ Import using  `read.csv`
 pups_base = read.csv("./data/FAS_pups.csv")
 pups_readr = read_csv("./data/FAS_pups.csv")
 
-View(pups_base)
-View(pups_readr)
+#View(pups_base)
+#View(pups_readr)
 
 pups_base
 pups_readr
 
-pups_base$S
-pups_readr$S
+#pups_base$S
+#pups_readr$S
 ```
 
 The dataset is not in the tibble format anymore so doesn't have useful information such as datatypes
