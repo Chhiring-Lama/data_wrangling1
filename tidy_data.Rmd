@@ -112,3 +112,43 @@ lotr_df <-
   mutate(race = str_to_lower(race))
 ```
 
+Import `litters` dataset
+```{r}
+litter_df = 
+  read_csv(
+    "./data/FAS_litters.csv",
+    na = c("NA", ".", "")) |>
+  janitor::clean_names() |>
+  separate(group, into = c("dose", "day_of_tx"), sep = 3) |>
+  relocate(litter_number) |>
+  mutate(
+    wt_gain = gd18_weight - gd0_weight,
+    dose = str_to_lower(dose))
+```
+
+Import `pups` dataset
+```{r}
+pup_df = 
+  read_csv(
+    "./data/FAS_pups.csv",
+    na = c("NA", "", ".")) |>
+  janitor::clean_names() |>
+  mutate(
+    sex = 
+      case_match(
+        sex, 
+        1 ~ "male", 
+        2 ~ "female"),
+    sex = as.factor(sex)) 
+
+```
+
+Join the datasets!
+```{r}
+fas_df = 
+  left_join(pup_df, litter_df, by = "litter_number") |> 
+  relocate(litter_number, dose, day_of_tx)
+
+fas_df
+```
+
